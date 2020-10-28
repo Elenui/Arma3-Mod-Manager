@@ -17,11 +17,12 @@ import sys
 import fileinput
 from bs4 import BeautifulSoup
 import configparser
+from pathlib import Path
 
-CONFIG_FILE = "lgsm/config-lgsm/arma3server/arma3mods.cfg"
 
-if not CONFIG_FILE.is_file():
-    print(CONFIG_FILE + " Does not exist check your file location")
+
+if not Path("lgsm/config-lgsm/arma3server/arma3mods.cfg").is_file():
+    print("lgsm/config-lgsm/arma3server/arma3mods.cfg Does not exist check your file location")
     exit(1)
 
 configParser = configparser.RawConfigParser()
@@ -41,7 +42,7 @@ modList             = {}
 
 
 
-if not uploadFolder.is_dir():
+if not Path(uploadFolder).is_dir():
     print(uploadFolder + " Does not exist you must create the folder.")
     exit(1)
 
@@ -49,9 +50,9 @@ if not uploadFolder.is_dir():
 for f_name in os.listdir(uploadFolder):
     if f_name.endswith('.html'):
         PRESET_FILE= uploadFolder + f_name
-        if not PRESET_FILE.is_dir():
-            print(PRESET_FILE + " Does not exist, PRESET_FILE must be a html\'s file ")
-            exit(1)
+    if not Path(PRESET_FILE).is_file():
+        print(PRESET_FILE + " Does not exist, PRESET_FILE must be a html\'s file ")
+        exit(1)
 
 with open(PRESET_FILE) as pf:
     soup = BeautifulSoup(pf, 'html.parser')
