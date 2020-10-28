@@ -22,7 +22,7 @@ CONFIG_FILE = "lgsm/config-lgsm/arma3server/arma3mods.cfg"
 
 if not CONFIG_FILE.is_file():
     print(CONFIG_FILE + " Does not exist check your file location")
-    exit 1
+    exit(1)
 
 configParser = configparser.RawConfigParser()
 configFilePath = r'lgsm/config-lgsm/arma3server/arma3mods.cfg'
@@ -43,7 +43,7 @@ modList             = {}
 
 if not uploadFolder.is_dir():
     print(uploadFolder + " Does not exist you must create the folder.")
-    exit 1
+    exit(1)
 
 # Search for preset html file
 for f_name in os.listdir(uploadFolder):
@@ -51,7 +51,7 @@ for f_name in os.listdir(uploadFolder):
         PRESET_FILE= uploadFolder + f_name
         if not PRESET_FILE.is_dir():
             print(PRESET_FILE + " Does not exist, PRESET_FILE must be a html\'s file ")
-            exit 1
+            exit(1)
 
 with open(PRESET_FILE) as pf:
     soup = BeautifulSoup(pf, 'html.parser')
