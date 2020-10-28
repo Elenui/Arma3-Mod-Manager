@@ -19,8 +19,8 @@ Create upload's folder.
 ## How do I use it ? 
 
 Create your server's preset with Arma 3 Client and export it as HTML's file, beautifulSoup will manage this part.
-![armaLauncher](https://ibb.co/3RYXpmP)
-![save](https://ibb.co/kXLBnpP)
+![armaLauncher](https://i.ibb.co/CPsdbKS/armalauncher.jpg)
+![save](https://i.ibb.co/hVG95kT/save.jpg)
 
 Just upload this HTML's file to your folder : upload.
 
