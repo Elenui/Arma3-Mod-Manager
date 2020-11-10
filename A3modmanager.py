@@ -1,5 +1,5 @@
 ##########################################################
-# Parse Arma's Preset file + install mods + restart LGSM 
+# Parse Arma's Preset file + install mods + restart LGSM
 #
 # Alexis TARUSSIO  : alexis.tarussio@gmail.com
 # 24/10/2020
@@ -18,6 +18,7 @@ import fileinput
 from bs4 import BeautifulSoup
 import configparser
 from pathlib import Path
+from subprocess import Popen, PIPE, STDOUT
 
 
 
@@ -31,7 +32,7 @@ configParser.read(configFilePath)
 
 LGSM_CONFIG_FILE    = configParser.get('arma-config', 'LGSM_CONFIG_FILE')
 steamUser           = configParser.get('arma-config', 'steamUser')
-steamPassword       = configParser.get('arma-config', 'steamPassword') 
+steamPassword       = configParser.get('arma-config', 'steamPassword')
 modDirectory        = os.environ["HOME"] + "/" + configParser.get('arma-config', 'modDirectory')
 steamCmdBin         = configParser.get('arma-config', 'steamCmdBin')
 armaServerBin       = os.environ["HOME"] + "/" + configParser.get('arma-config', 'armaServerBin')
@@ -50,9 +51,9 @@ if not Path(uploadFolder).is_dir():
 for f_name in os.listdir(uploadFolder):
     if f_name.endswith('.html'):
         PRESET_FILE= uploadFolder + f_name
-    if not Path(PRESET_FILE).is_file():
-        print(PRESET_FILE + " Does not exist, PRESET_FILE must be a html\'s file ")
-        exit(1)
+        if not Path(PRESET_FILE).is_file():
+            print(PRESET_FILE + " Does not exist, PRESET_FILE must be a html\'s file ")
+            exit(1)
 
 with open(PRESET_FILE) as pf:
     soup = BeautifulSoup(pf, 'html.parser')
@@ -60,11 +61,11 @@ table = soup.find("table")
 
 tr = table.findAll(['tr'])[0:]
 
-for data in tr: 
+for data in tr:
     td = data.find_all('td', attrs={"data-type":"DisplayName"})
     tdData = [col.text.strip('\n') for col in td]
     modName = tdData[0].lower().replace(" ", "_")
-    for specialchar in [".", ":", "(", ")", "+"]:
+    for specialchar in [".", ":", "(", ")", "+", "'", "/"]:
         modName = modName.replace(specialchar, "")
     url = data.find_all('a')
     urlData = [col.text.strip('\n') for col in url]
@@ -74,12 +75,11 @@ for data in tr:
 # Delete PRESET_FILE to maintain uploadDir clean.
 os.remove(PRESET_FILE)
 
-# Install Mods 
+steamcmd_data = ""
+# Install Mods
 for key, value in modList.items():
-    print ('\n=============== Begin install of ' +  key + ' ===============\n')
-    # Call SteamCMD in order to download mod
-    subprocess.call([steamCmdBin, "+login", steamUser,  steamPassword, "+force_install_dir", modDirectory, "+workshop_download_item", "107410", value, "+quit"])
-    # Create Symlink 
+    steamcmd_data += "workshop_download_item 107410 " + value + "\n"
+    # Create Symlink
     workshopDir= modDirectory + "steamapps/workshop/content/107410/" + value
     targetDir= modDirectory +"@" + key
     if not os.path.exists(targetDir):
@@ -87,6 +87,12 @@ for key, value in modList.items():
     serverMods += "mods/@" + key + "\;"
 
 serverMods += "\""
+
+steamcmd_data += "quit"
+p = subprocess.run([steamCmdBin, "+login", steamUser,  steamPassword, "+force_install_dir", modDirectory], input=steamcmd_data, encoding='ascii')
+
+print(p.returncode)
+
 
 print('\n=============== Lowercase Mods\s Files  ===============\n')
 
